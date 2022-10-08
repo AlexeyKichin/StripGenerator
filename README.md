@@ -5,11 +5,11 @@ REQUIREMENTS:
   - maven 3+
 
 
-Directory structure follow classic maven format.
+Directory structure follows the classic maven format.
 Source classes are located in the home package.
 
 Demo class is home.Strip. It represents a collection of tickets and methods to generate it according to the requirements.
-I have also added the main method to it to see a demo. The main method generated 10000 strips, prints out first 10 of them and prints the overall execution time.
+I have also added the main method to it to see a demo. The main method generates 10000 strips, prints out first 10 of them and prints the overall execution time.
 On my laptop(Core i5-8250U) it takes about 900ms to generate 10000 strips.
 
 Unit tests cover 4 scenarios:

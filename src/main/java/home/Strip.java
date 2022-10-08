@@ -34,10 +34,7 @@ public class Strip {
         ArrayList<Integer> options = new ArrayList<>();
         IntStream.rangeClosed(from, to).forEach(options::add);
         buckets.put(column, options);
-        if (!bucketsBySize.containsKey(options.size())) {
-            bucketsBySize.put(options.size(), new HashSet<>());
-        }
-        bucketsBySize.get(options.size()).add(column);
+        bucketsBySize.computeIfAbsent(options.size(), k -> new HashSet<>()).add(column);
     }
 
     @Override

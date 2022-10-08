@@ -65,7 +65,7 @@ public class Strip {
                             oneSizeColumns.remove(pushedColumn);
                         }
                         if (sizeKey > 1) {
-                            Set<Integer> newSizeSet = bucketsBySize.computeIfAbsent(sizeKey - 1, k->new HashSet<>());
+                            Set<Integer> newSizeSet = bucketsBySize.computeIfAbsent(sizeKey - 1, k -> new HashSet<>());
                             newSizeSet.add(pushedColumn);
                         }
                         break colSearch;

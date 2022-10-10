@@ -10,15 +10,27 @@ public class Strip {
     private final TreeMap<Integer, Set<Integer>> bucketsBySize = new TreeMap<>();
     @Getter
     private final Ticket[] tickets = new Ticket[6];
+    private final boolean randomizer;
 
-    Strip() {
-        fillSourceBuckets();
-        for (int i = 0; i < tickets.length; i++) {
-            tickets[i] = prepareTicket();
+    Strip(boolean randomizer) {
+        this.randomizer = randomizer;
+        setupStrip:
+        while (true) {
+            fillSourceBuckets();
+            for (int i = 0; i < tickets.length; i++) {
+                tickets[i] = prepareTicket();
+                if (tickets[i] == null) {
+                    continue setupStrip;  // ok, random distribution caused the conflict, redo the strip
+                }
+            }
+            // all tickets good
+            break;
         }
     }
 
     private void fillSourceBuckets() {
+        buckets.clear();
+        bucketsBySize.clear();
         fillOneSourceBucket(0, 1, 9);
         fillOneSourceBucket(1, 10, 19);
         fillOneSourceBucket(2, 20, 29);
@@ -54,7 +66,7 @@ public class Strip {
                 Set<Integer> oneSizeColumns = bucketsBySize.get(sizeKey);
                 List<Integer> columns = new ArrayList<>(oneSizeColumns);
                 while (!columns.isEmpty()) {
-                    int pushedColumn = ticket.pushColumns(columns, buckets);
+                    int pushedColumn = ticket.pushColumns(columns, buckets, randomizer ? (int) (Math.random() * 10) : 0);
                     if (pushedColumn >= 0) {
                         if (oneSizeColumns.size() == 1) {
                             bucketsBySize.remove(sizeKey);
@@ -66,6 +78,8 @@ public class Strip {
                             newSizeSet.add(pushedColumn);
                         }
                         break colSearch;
+                    } else {
+                        return null; // wrong distribution, restart
                     }
                 }
             }
@@ -74,10 +88,11 @@ public class Strip {
     }
 
     public static void main(String[] args) {
+        final boolean RANDOMIZE_POSITIONS = false;
         long initTime = System.currentTimeMillis();
         int stripNumber = 0;
         for (int stripCount = 0; stripCount < 10000; stripCount++) {
-            Strip strip = new Strip();
+            Strip strip = new Strip(RANDOMIZE_POSITIONS);
             if (stripNumber++ < 10) {
                 System.out.println("Strip " + stripNumber);
                 System.out.println(strip);

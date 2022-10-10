@@ -3,7 +3,10 @@ package home;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class Ticket {
     @Getter(AccessLevel.PACKAGE)
@@ -21,15 +24,19 @@ public class Ticket {
         return true;
     }
 
-    public int pushColumns(List<Integer> columns, Map<Integer, ArrayList<Integer>> valueBuckets) {
-        Integer[] cols=columns.toArray(new Integer[0]);
-        Arrays.sort(cols, Comparator.comparingInt(o -> columnCount[o]));
+    public int pushColumns(
+            List<Integer> columns,
+            Map<Integer, ArrayList<Integer>> valueBuckets,
+            int stripRandomizer // used to randomize strips, make sure cells are not filled in the same way in different strips
+    ) {
+        Integer[] cols = columns.toArray(new Integer[0]);
+        Arrays.sort(cols, (o1, o2) -> columnCount[o1] > columnCount[o2] ? 1 : columnCount[o1] < columnCount[o2] ? -1 : (o1 * o2 * stripRandomizer & 16) > 0 ? 1 : -1);
         Integer[] rows = new Integer[]{0, 1, 2};
-        Arrays.sort(rows, Comparator.comparingInt(o -> rowCount[o]));
+        Arrays.sort(rows, (o1, o2) -> rowCount[o1] > rowCount[o2] ? 1 : rowCount[o1] < rowCount[o2] ? -1 : (o1 * o2 * stripRandomizer & 16) > 0 ? 1 : -1);
         for (Integer col : cols) {
             for (Integer row : rows) {
                 ArrayList<Integer> values = valueBuckets.get(col);
-                int valueIdx = (int)(Math.random()*values.size());
+                int valueIdx = (int) (Math.random() * values.size());
                 int value = values.get(valueIdx);
                 if (push(row, col, value)) {
                     values.remove(valueIdx);
@@ -44,9 +51,9 @@ public class Ticket {
         int[] rowCount = new int[3];
         int[] columnCount = new int[9];
 
-        for (int i=0 ; i<data.length;i++) {
-            for (int j=0 ; j<data[i].length;j++) {
-                if(data[i][j]!=null){
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                if (data[i][j] != null) {
                     rowCount[i]++;
                     columnCount[j]++;
                 }
